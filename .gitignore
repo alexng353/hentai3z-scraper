@@ -1,0 +1,3 @@
+images/*
+!.gitkeep
+node_modules/
