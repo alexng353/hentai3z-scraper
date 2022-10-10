@@ -1,8 +1,16 @@
 import fetch from "node-fetch";
 import fs from "fs";
 
-import e from "./utils/escape";
-// escape codes
+const e = {
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+  end: "\x1b[0m",
+};
 
 function prompt(question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -91,8 +99,10 @@ async function getChapterList(id: string, url: string): Promise<string[]> {
 
 async function getChapter(url: string) {
   const [tmp, chapter] = url.split("/").slice(-3);
+  const rename = tmp.split("-").slice(0, -1).join("-");
+
   const regex = new RegExp(
-    `https://img.hentai3z.com/${tmp}/${chapter}/(\\d+)\\.jpg`,
+    `https://img.hentai3z.com/${rename}/${chapter}/(\\d+)\\.jpg`,
     "g"
   );
   const name = tmp
@@ -101,7 +111,10 @@ async function getChapter(url: string) {
     .map((word) => {
       return word[0].toUpperCase() + word.slice(1);
     })
+    // remove the last word
+    .slice(0, -1)
     .join(" ");
+
   const res = await fetch(url);
   const body = await res.text();
   const matches = body.match(regex);
@@ -180,58 +193,35 @@ async function main() {
     .join(" ");
   console.log(name);
 
-  // console.log(e.green + "Getting manga id" + e.end);
   // log above with no newline
-  // process.stdout.write(e.green + "Getting manga id... " + e.end);
+  process.stdout.write(e.green + "Getting manga id... " + e.end);
 
-  // const id = await getChapterID(url);
-  // console.log("id: " + e.green + id + e.end);
+  const id = await getChapterID(url);
+  console.log("id: " + e.green + id + e.end);
 
-  // console.log(e.green + "Getting chapter list" + e.end);
+  console.log(e.green + "Getting chapter list" + e.end);
 
-  // const chapters = await getChapterList(id, url);
+  const chapters = await getChapterList(id, url);
   // console.log(chapters);
-  // console.log(e.green + "Chapters found: " + e.end + chapters.length);
+  console.log(e.green + "Chapters found: " + e.end + chapters.length);
   // console.log("Found " + e.green + chapters.length + e.end + " chapters");
-  // const res = await prompt("Download all chapters? (y/n) ");
-  // if (res.toLowerCase() === "y") {
-  //   console.log("Downloading all chapters");
-  // } else {
-  //   console.log(e.red + "Exiting" + e.end);
-  //   process.exit(0);
-  // }
-
-  // // remove first 17 entries
-  // chapters.forEach((chapter) => {
-  //   setTimeout(() => {
-  //     console.log(chapter);
-
-  //     getChapter(chapter);
-  //   }, 5000 * chapters.indexOf(chapter));
-  // });
-  // console.log(e.green + "Done" + e.end);
-
-  const compress = await prompt("Compress images? (y/n) ");
-  if (compress.toLowerCase() === "y") {
-    const [chapter] = url.split("/").slice(-1);
-    const regex = new RegExp(`https://img.hentai3z.com/manga/${chapter}`, "g");
-    const name = tmp
-      .replace(/-/g, " ")
-      .split(" ")
-      .map((word) => {
-        return word[0].toUpperCase() + word.slice(1);
-      })
-      .join(" ");
-    const path = `./images/${name}/${chapter}`;
-    // remove last / from path
-    const dir = path.slice(0, -1);
-    // Compress(dir);
-    // start process "npm run compress {dir}"
+  const res = await prompt("Download all chapters? (y/n) ");
+  if (res.toLowerCase() === "y") {
+    console.log("Downloading all chapters");
   } else {
     console.log(e.red + "Exiting" + e.end);
     process.exit(0);
   }
-  process.exit(0);
+
+  // remove first 17 entries
+  chapters.forEach((chapter) => {
+    setTimeout(() => {
+      console.log(chapter);
+
+      getChapter(chapter);
+    }, 5000 * chapters.indexOf(chapter));
+  });
+  console.log(e.green + "Done" + e.end);
 }
 
 main();

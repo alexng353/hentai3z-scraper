@@ -13,6 +13,8 @@ app.use(cors(corsOptions));
 
 app.use("/images", express.static("images"));
 
+app.use("/compressed", express.static("output"));
+
 app.get("/images", (req, res) => {
   res.status(404).json({ message: "Not found" });
 });
