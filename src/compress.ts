@@ -52,7 +52,7 @@ function getFoldersInPath(path: string) {
   return folders;
 }
 
-const path = "./images/When Did We Start Dating";
+const path = "./images/Queen Bee";
 // make sure ./output/{name} exists
 if (!fs.existsSync(`./output/${path.split("/").slice(-1)[0]}`)) {
   fs.mkdirSync(`./output/${path.split("/").slice(-1)[0]}`);

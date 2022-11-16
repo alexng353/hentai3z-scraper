@@ -212,15 +212,23 @@ async function main() {
     console.log(e.red + "Exiting" + e.end);
     process.exit(0);
   }
+  // only download after chapter 212
 
-  // remove first 17 entries
-  chapters.forEach((chapter) => {
-    setTimeout(() => {
-      console.log(chapter);
+  const start = 212;
 
-      getChapter(chapter);
-    }, 5000 * chapters.indexOf(chapter));
-  });
+  for (let i = start; i < chapters.length; i++) {
+    const chapter = chapters[i];
+    console.log(e.green + "Downloading chapter " + e.end + chapter);
+    await getChapter(chapter);
+  }
+
+  // chapters.forEach((chapter) => {
+  //   setTimeout(() => {
+  //     console.log(chapter);
+
+  //     getChapter(chapter);
+  //   }, 10000 * chapters.indexOf(chapter));
+  // });
   console.log(e.green + "Done" + e.end);
 }
 
